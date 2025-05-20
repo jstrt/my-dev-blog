@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function PostsPage() {
   const [posts, setPosts] = useState([]);
@@ -6,7 +7,10 @@ export default function PostsPage() {
   useEffect(() => {
     fetch("http://localhost:5000/api/posts")
       .then((res) => res.json())
-      .then((data) => setPosts(data))
+      .then((data) => {
+        console.log("서버 응답".data);
+        setPosts(data);
+      })
       .catch((err) => console.error("글 불러오기 실패", err));
   }, []);
 
@@ -26,7 +30,9 @@ export default function PostsPage() {
               borderRadius: "0.5rem",
             }}
           >
-            <h2>{post.title}</h2>
+            <h2>
+              <Link href={`/posts/${post._id}`}>{post.title}</Link>
+            </h2>
             <p>{post.body}</p>
             <small>{new Date(post.createdAt).toLocaleString()}</small>
           </div>
