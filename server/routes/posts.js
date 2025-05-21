@@ -72,4 +72,22 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+router.get("/", async (req, res) => {
+  try {
+    const { q } = req.query;
+
+    let filter = {};
+    if (q) {
+      const regex = new RegExp(q, "i");
+      filter = {
+        $or: [{ title: regex }, { body: regex }],
+      };
+    }
+    const posts = await Post.find(filter).sort({ createdAt: -1 });
+    res.json(posts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
