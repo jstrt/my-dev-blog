@@ -1,43 +1,33 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-export default function PostsPage() {
+export default function PostList() {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/posts")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("서버 응답".data);
-        setPosts(data);
-      })
-      .catch((err) => console.error("글 불러오기 실패", err));
+    const fetchPosts = async () => {
+      const res = await fetch("http://localhost:5000/api/posts");
+      const data = await res.json();
+      setPosts(data);
+    };
+    fetchPosts();
   }, []);
 
   return (
-    <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
-      <h1>글 목록</h1>
-      {posts.length === 0 ? (
-        <p>글이 없습니다.</p>
-      ) : (
-        posts.map((post) => (
-          <div
-            key={post._id}
-            style={{
-              marginBottom: "1.5rem",
-              padding: "1rem",
-              border: "1px solid #ddd",
-              borderRadius: "0.5rem",
-            }}
-          >
-            <h2>
-              <Link href={`/posts/${post._id}`}>{post.title}</Link>
-            </h2>
-            <p>{post.body}</p>
-            <small>{new Date(post.createdAt).toLocaleString()}</small>
-          </div>
-        ))
-      )}
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">글 목록</h1>
+      <ul className="space-y-4">
+        {posts.map((post) => (
+          <li key={post._id} className="border p-4 rounded">
+            <Link
+              href={`/posts/${post._id}`}
+              className="text-blue-600 font-semibold hover:underline"
+            >
+              {post.title}
+            </Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
