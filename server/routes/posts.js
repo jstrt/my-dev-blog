@@ -39,4 +39,37 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+router.put("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, body, language } = req.body;
+
+    const updatePost = await Post.findByIdAndUpdate(
+      id,
+      { title, body, language },
+      { new: true }
+    );
+
+    if (!updatePost) return res.status(404).json({ error: "Post not found" });
+    res.json(updatePost);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletePost = await Post.findByIdAndDelete(id);
+
+    if (!deletePost) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    res.json({ message: "Post deleted" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
