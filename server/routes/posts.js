@@ -90,4 +90,30 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.patch("/:id/like", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { like } = req.body; // true or false
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid ID format" });
+    }
+
+    const post = await Post.findById(id);
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    if (typeof post.likes !== "number") post.likes = 0;
+    post.likes += like ? 1 : -1;
+    if (post.likes < 0) post.likes = 0;
+
+    await post.save();
+
+    res.json(post);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

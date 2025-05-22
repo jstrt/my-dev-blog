@@ -4,63 +4,84 @@ import { useRouter } from "next/router";
 export default function Write() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [lang, setLang] = useState("ko");
+  const [language, setLanguage] = useState("ko");
   const router = useRouter();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newPost = { title, body, lang };
-    console.log("새 포스트:", newPost);
+    const res = await fetch("http://localhost:5000/api/posts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, body, language }),
+    });
 
-    // TODO: 서버로 전송 또는 DB 저장
-    alert("작성 완료! 콘솔에서 확인하세요.");
-    router.push("/"); // 홈으로 이동
+    if (res.ok) {
+      alert("글이 성공적으로 저장되었습니다.");
+      router.push("/posts"); // 글 목록 페이지로 이동
+    } else {
+      alert("저장 실패!");
+    }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>포스트 작성</h1>
+    <div
+      style={{
+        padding: "2rem",
+        fontFamily: "sans-serif",
+        maxWidth: "600px",
+        margin: "auto",
+      }}
+    >
+      <h1>글 쓰기</h1>
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="제목"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          style={{ display: "block", width: "100%", marginBottom: "10px" }}
-        />
+        <div>
+          <label>제목</label>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+            style={{ width: "100%", padding: "0.5rem", marginBottom: "1rem" }}
+          />
+        </div>
 
-        <textarea
-          placeholder="내용"
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          rows={8}
-          style={{ display: "block", width: "100%", marginBottom: "10px" }}
-        />
+        <div>
+          <label>본문</label>
+          <textarea
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            required
+            rows={6}
+            style={{ width: "100%", padding: "0.5rem", marginBottom: "1rem" }}
+          />
+        </div>
 
-        <div style={{ marginBottom: "10px" }}>
-          <label>
+        <div style={{ marginBottom: "1rem" }}>
+          <label>언어 선택: </label>
+          <label style={{ marginRight: "1rem" }}>
             <input
               type="radio"
               value="ko"
-              checked={lang === "ko"}
-              onChange={(e) => setLang(e.target.value)}
+              checked={language === "ko"}
+              onChange={(e) => setLanguage(e.target.value)}
             />
             한국어
           </label>
-          {"  "}
           <label>
             <input
               type="radio"
               value="en"
-              checked={lang === "en"}
-              onChange={(e) => setLang(e.target.value)}
+              checked={language === "en"}
+              onChange={(e) => setLanguage(e.target.value)}
             />
             English
           </label>
         </div>
 
-        <button type="submit">작성 완료</button>
+        <button type="submit" style={{ padding: "0.5rem 1rem" }}>
+          저장하기
+        </button>
       </form>
     </div>
   );
